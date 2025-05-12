@@ -31,7 +31,7 @@ function Login() {
           Sign In
         </Button>
         <p className="text-center text-xs md:text-sm text-gray-600 mt-4 md:mt-6">
-          Don't have an account?{" "}
+          Don&apos;t have an account?{" "}
           <Link href={"/signup"}>
             <span className="text-emerald-600 font-medium cursor-pointer">
               Sign Up

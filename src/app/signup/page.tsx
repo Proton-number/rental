@@ -43,7 +43,7 @@ function SignUp() {
                 : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
             }`}
           >
-            I'm a Tenant
+            I&apos;m a Tenant
           </Button>
           <Button
             onClick={() => setRole("agent")}
@@ -53,7 +53,7 @@ function SignUp() {
                 : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
             }`}
           >
-            I'm an Agent
+            I&apos;m an Agent
           </Button>
         </div>
         <Button className="w-full bg-emerald-600 text-white p-3 rounded-md hover:bg-emerald-700 transition text-base font-medium cursor-pointer">
