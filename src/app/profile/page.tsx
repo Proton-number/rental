@@ -11,7 +11,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
 import { SquarePen, Lock, Trash2 } from "lucide-react";
-import React from "react";
 
 function page() {
   return (

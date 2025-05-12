@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import Image from "next/image";
 import Link from "next/link";
 function Login() {
   return (
@@ -10,7 +11,7 @@ function Login() {
           Sign in to Rentify
         </h1>
         <Button className="cursor-pointer w-full bg-white text-gray-800 border border-gray-300 hover:bg-gray-100 text-sm md:text-base">
-          <img
+          <Image
             src="https://www.svgrepo.com/show/475656/google-color.svg"
             alt="Google"
             className="w-4 md:w-5 h-4 md:h-5 mr-2"
