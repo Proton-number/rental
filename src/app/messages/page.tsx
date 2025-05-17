@@ -3,7 +3,7 @@
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Menu, Send, ArrowLeft, Sidebar } from "lucide-react";
+import { Search, Send, ArrowLeft } from "lucide-react";
 import React, { useState, useEffect, useRef } from "react";
 
 const chat = [
@@ -208,22 +208,23 @@ function Messages() {
       window.removeEventListener("keydown", handleEscape);
     };
   }, []);
+
   useEffect(() => {
     const container = messagesWrapperRef.current;
-    if (!container) return;
+    if (!container || !justSentMessage) return;
 
-    const scrollBuffer = 100; // px threshold to define "near bottom"
-    const distanceFromBottom =
-      container.scrollHeight - container.scrollTop - container.clientHeight;
+    const isNearBottom = () => {
+      const scrollPosition = container.scrollHeight - container.scrollTop - container.clientHeight;
+      const threshold = 100;
+      return scrollPosition <= threshold;
+    };
 
-    const isUserNearBottom = distanceFromBottom <= scrollBuffer;
-
-    if (justSentMessage && isUserNearBottom) {
+    if (isNearBottom()) {
       container.scrollTop = container.scrollHeight;
     }
 
     setJustSentMessage(false);
-  }, [messageList[selectedChat as keyof typeof messageList]]);
+  }, [messageList[selectedChat as keyof typeof messageList], justSentMessage]);
 
   return (
     <div className="flex min-h-screen bg-gray-50 ">

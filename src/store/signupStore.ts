@@ -2,7 +2,6 @@ import { auth, googleProvider, db } from "@/config/firebase";
 import {
   createUserWithEmailAndPassword,
   signInWithPopup,
-  onAuthStateChanged,
   User,
 } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";

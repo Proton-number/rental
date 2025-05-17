@@ -16,7 +16,7 @@ import {
 import Link from "next/link";
 import { useState } from "react";
 
-function page() {
+function Notifications() {
   const initialNotifications = [
     {
       id: 1,
@@ -230,4 +230,4 @@ function page() {
   );
 }
 
-export default page;
+export default Notifications;
