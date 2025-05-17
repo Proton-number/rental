@@ -14,7 +14,9 @@ function Login() {
           <Image
             src="https://www.svgrepo.com/show/475656/google-color.svg"
             alt="Google"
-            className="w-4 md:w-5 h-4 md:h-5 mr-2"
+            width={20}
+            height={20}
+            className=" mr-2"
           />
           Sign in with Google
         </Button>
@@ -30,14 +32,19 @@ function Login() {
         <Button className="w-full mt-3 bg-emerald-600 text-white p-2 md:p-3 rounded-md hover:bg-emerald-700 transition text-sm md:text-base font-medium cursor-pointer">
           Sign In
         </Button>
-        <p className="text-center text-xs md:text-sm text-gray-600 mt-4 md:mt-6">
-          Don&apos;t have an account?{" "}
-          <Link href={"/signup"}>
-            <span className="text-emerald-600 font-medium cursor-pointer">
-              Sign Up
-            </span>
-          </Link>
-        </p>
+        <div>
+          <p className="text-center text-xs md:text-sm text-gray-600 ">
+            Forget Password ?
+          </p>
+          <p className="text-center text-xs md:text-sm text-gray-600 mt-4 md:mt-6">
+            Don&apos;t have an account?{" "}
+            <Link href={"/signup"}>
+              <span className="text-emerald-600 font-medium cursor-pointer">
+                Sign Up
+              </span>
+            </Link>
+          </p>
+        </div>
       </Card>
     </div>
   );

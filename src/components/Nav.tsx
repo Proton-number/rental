@@ -32,7 +32,7 @@ function Nav() {
         </Link>
 
         {/* Menu icon for mobile */}
-        <div className="sm:hidden">
+        <div className="md:hidden">
           <Menu
             onClick={() => setIsMobileOpen(true)}
             className="cursor-pointer"
@@ -40,7 +40,7 @@ function Nav() {
         </div>
 
         {/* Desktop Buttons */}
-        <div className="space-x-4 hidden sm:flex">
+        <div className="space-x-4 hidden md:flex">
           <>
             <Link href="/login">
               <Button variant="link" className="cursor-pointer">
@@ -92,7 +92,7 @@ function Nav() {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ duration: 0.3 }}
-            className="fixed top-0 right-0 h-full w-64 bg-white shadow-lg flex flex-col  space-y-6 p-4 z-20 sm:hidden"
+            className="fixed top-0 right-0 h-full w-64 sm:w-90 bg-white shadow-lg flex flex-col  space-y-6 p-4 z-20 md:hidden"
           >
             <X
               onClick={() => setIsMobileOpen(false)}

@@ -3,7 +3,7 @@ import Link from "next/link";
 
 function Footer() {
   return (
-    <div className=" p-6 mt-12 bg-gray-50  w-full">
+    <div className=" p-6  bg-gray-50  w-full">
       <div className="flex justify-center">
         <div className="flex flex-col md:flex-row items-start justify-between gap-16 md:gap-32 max-w-5xl w-full">
           {/* Rentify Section */}
