@@ -17,8 +17,6 @@ function SignUp() {
     setEmail,
     name,
     setName,
-    phoneNumber,
-    setPhoneNumber,
     password,
     setPassword,
     signInWithGoogle,
@@ -27,10 +25,19 @@ function SignUp() {
 
   const handleGoogleSignIn = async () => {
     const user = await signInWithGoogle();
+    console.log("Google user:", user);
     if (user) {
-      router.push("/");
+      router.push("/listings");
     }
   };
+
+  const handleEmailAndPassword = async () => {
+    const user = await createAccount();
+    if (user) {
+      router.push("/listings");
+    }
+  };
+
   return (
     <div className="flex flex-col justify-center items-center p-4 md:p-16 mt-6 md:mt-12 mb-6 md:mb-12">
       <Card className="w-full max-w-[384px] p-4 md:p-6 shadow-md">
@@ -69,12 +76,6 @@ function SignUp() {
             onChange={(e) => setEmail(e.target.value)}
           />
           <Input
-            placeholder="Enter your Phone Number"
-            type="tel"
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-          />
-          <Input
             placeholder="Password"
             type="password"
             value={password}
@@ -105,7 +106,7 @@ function SignUp() {
           </Button>
         </div>
         <Button
-          onClick={createAccount}
+          onClick={handleEmailAndPassword}
           className="w-full bg-emerald-600 text-white p-3 rounded-md hover:bg-emerald-700 transition text-base font-medium cursor-pointer"
         >
           Create Account

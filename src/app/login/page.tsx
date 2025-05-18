@@ -1,16 +1,45 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useLoginStore } from "@/store/loginStore";
+import { signupStore } from "@/store/signupStore";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 function Login() {
+  const router = useRouter();
+
+  const { signInWithGoogle } = signupStore();
+  const { SignIn } = useLoginStore();
+
+  const handleGoogleLogin = async () => {
+    const user = await signInWithGoogle();
+    console.log("Google user logged in is:", user);
+    if (user) {
+      router.push("/listings");
+    }
+  };
+
+  const handleSignIn = async () => {
+    const user = await SignIn();
+    console.log("Google user logged in is:", user);
+    if (user) {
+      router.push("/listings");
+    }
+  };
+
   return (
     <div className="flex flex-col justify-center items-center mt-6 md:mt-12 mb-6 md:mb-12 p-4">
       <Card className="w-full max-w-sm p-4 md:p-6 shadow-md">
         <h1 className="font-bold text-xl md:text-2xl text-center mb-4">
           Sign in to Rentify
         </h1>
-        <Button className="cursor-pointer w-full bg-white text-gray-800 border border-gray-300 hover:bg-gray-100 text-sm md:text-base">
+        <Button
+          onClick={handleGoogleLogin}
+          className="cursor-pointer w-full bg-white text-gray-800 border border-gray-300 hover:bg-gray-100 text-sm md:text-base"
+        >
           <Image
             src="https://www.svgrepo.com/show/475656/google-color.svg"
             alt="Google"
@@ -29,7 +58,10 @@ function Login() {
           <Input placeholder="Email address" />
           <Input placeholder="Password" type="password" />
         </div>
-        <Button className="w-full mt-3 bg-emerald-600 text-white p-2 md:p-3 rounded-md hover:bg-emerald-700 transition text-sm md:text-base font-medium cursor-pointer">
+        <Button
+          onClick={handleSignIn}
+          className="w-full mt-3 bg-emerald-600 text-white p-2 md:p-3 rounded-md hover:bg-emerald-700 transition text-sm md:text-base font-medium cursor-pointer"
+        >
           Sign In
         </Button>
         <div>
