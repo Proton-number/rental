@@ -1,14 +1,23 @@
 "use client";
 
+import ErrorMessage from "@/components/ErrorMessage";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useAppStore } from "@/store/appStore";
 import { signupStore } from "@/store/signupStore";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Eye, EyeClosed } from "lucide-react";
+import { useState } from "react";
+
 function SignUp() {
   const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
+  };
 
   const {
     role,
@@ -22,6 +31,7 @@ function SignUp() {
     signInWithGoogle,
     createAccount,
   } = signupStore();
+  const { registerError } = useAppStore();
 
   const handleGoogleSignIn = async () => {
     const user = await signInWithGoogle();
@@ -71,16 +81,38 @@ function SignUp() {
           />
           <Input
             placeholder="Email address"
+            aria-label="Email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
-          <Input
-            placeholder="Password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+          <div className="relative">
+            <Input
+              placeholder="Password"
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              aria-label="Password"
+              minLength={8}
+              required
+            />
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={togglePasswordVisibility}
+              className=" cursor-pointer absolute right-1 top-0.5 text-gray-500 hover:text-gray-700 transition-colors hover:bg-transparent"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              type="button"
+            >
+              {showPassword ? (
+                <EyeClosed size={20} aria-hidden="true" />
+              ) : (
+                <Eye size={20} aria-hidden="true" />
+              )}
+            </Button>
+          </div>
+
+          <ErrorMessage message={registerError} />
         </div>
 
         <div className="flex flex-col sm:flex-row justify-between items-center gap-2 my-3">

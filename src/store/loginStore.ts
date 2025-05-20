@@ -8,7 +8,6 @@ interface LOGIN {
   setEmail: (val: string) => void;
   password: string;
   setPassword: (val: string) => void;
-  error: string | null;
   SignIn: () => Promise<User | null>;
   logOut: () => Promise<void>;
 }
@@ -23,27 +22,27 @@ export const useLoginStore = create<LOGIN>((set, get) => ({
 
   password: "",
   setPassword: (val) => set({ password: val }),
-  error: null,
 
   SignIn: async (): Promise<User | null> => {
     try {
       const { email, password } = get();
 
       if (!email || !password) {
-        set({ error: "Email and password are required" });
+        const message = "Email and password are required";
+        useAppStore.getState().setLoginError(message);
         return null;
       }
 
       if (!emailRegex.test(email)) {
-        set({ error: "Please enter a valid email address" });
+        const message = "Please enter a valid email address";
+        useAppStore.getState().setLoginError(message);
         return null;
       }
 
       if (!passwordRegex.test(password)) {
-        set({
-          error:
-            "Password must contain at least 8 characters, including uppercase, lowercase, numbers and special characters",
-        });
+        const message =
+          "Password must contain at least 8 characters, including uppercase, lowercase, numbers and special characters";
+        useAppStore.getState().setLoginError(message);
         return null;
       }
 
@@ -52,12 +51,12 @@ export const useLoginStore = create<LOGIN>((set, get) => ({
 
       useAppStore.getState().setUser(user);
 
-      set({ error: null });
+      useAppStore.getState().setLoginError(null);
       return user;
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "An unknown error occurred";
-      set({ error: errorMessage });
+      useAppStore.getState().setLoginError(errorMessage);
       return null;
     }
   },
@@ -66,11 +65,12 @@ export const useLoginStore = create<LOGIN>((set, get) => ({
     try {
       await signOut(auth);
       useAppStore.getState().setUser(null);
-      set({ email: "", password: "", error: null });
+      useAppStore.getState().setLoginError(null);
+      set({ email: "", password: "" });
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "An unknown error occurred";
-      set({ error: errorMessage });
+      useAppStore.getState().setLoginError(errorMessage);
     }
   },
 }));

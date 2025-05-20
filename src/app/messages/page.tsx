@@ -214,7 +214,8 @@ function Messages() {
     if (!container || !justSentMessage) return;
 
     const isNearBottom = () => {
-      const scrollPosition = container.scrollHeight - container.scrollTop - container.clientHeight;
+      const scrollPosition =
+        container.scrollHeight - container.scrollTop - container.clientHeight;
       const threshold = 100;
       return scrollPosition <= threshold;
     };
