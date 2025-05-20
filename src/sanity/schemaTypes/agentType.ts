@@ -1,5 +1,4 @@
 import { defineField, defineType } from "sanity";
-import { UserIcon } from "@sanity/icons";
 
 export default defineType({
   name: "agent",
