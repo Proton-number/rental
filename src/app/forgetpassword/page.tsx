@@ -2,7 +2,7 @@
 
 import { Card } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import { useAppStore } from "@/store/appStore";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ export default function ForgotPassword() {
   const router = useRouter();
   const { resetEmail, setResetEmail, resetHandler, resetError } = useAppStore();
 
-  const resetButton = async () => {
+  const resetButton = useCallback(async () => {
     const success = await resetHandler();
     if (success) {
       setTimeout(() => {
@@ -19,7 +19,7 @@ export default function ForgotPassword() {
         router.push("/login");
       }, 2000);
     }
-  };
+  }, [resetHandler, setResetEmail, router]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -27,6 +27,7 @@ export default function ForgotPassword() {
         resetButton();
       }
     };
+
     window.addEventListener("keydown", handleKeyDown);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);

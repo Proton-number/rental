@@ -1,4 +1,4 @@
-import { defineType } from "sanity";
+import { defineType, Rule } from "sanity";
 
 export default defineType({
   name: "property",
@@ -10,7 +10,7 @@ export default defineType({
       name: "title",
       title: "Title",
       type: "string",
-      validation: (Rule: any) => Rule.required().min(5).max(80),
+      validation: (Rule: Rule) => Rule.required().min(5).max(80),
     },
     {
       name: "slug",
@@ -37,7 +37,7 @@ export default defineType({
       name: "price",
       title: "Price",
       type: "number",
-      validation: (Rule: any) => Rule.required().positive(),
+      validation: (Rule: Rule) => Rule.required().positive(),
     },
     {
       name: "propertyDetails",
@@ -117,7 +117,7 @@ export default defineType({
       title: "Listed By",
       type: "reference",
       to: [{ type: "agent" }],
-      validation: (Rule: any) => Rule.required(),
+      validation: (Rule: Rule) => Rule.required(),
     },
     {
       name: "createdAt",

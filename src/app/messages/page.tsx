@@ -213,6 +213,9 @@ function Messages() {
     const container = messagesWrapperRef.current;
     if (!container || !justSentMessage) return;
 
+    const currentMessages =
+      messageList[selectedChat as keyof typeof messageList];
+
     const isNearBottom = () => {
       const scrollPosition =
         container.scrollHeight - container.scrollTop - container.clientHeight;
@@ -225,7 +228,7 @@ function Messages() {
     }
 
     setJustSentMessage(false);
-  }, [messageList[selectedChat as keyof typeof messageList], justSentMessage]);
+  }, [justSentMessage, selectedChat]);
 
   return (
     <div className="flex min-h-screen bg-gray-50 ">

@@ -8,12 +8,14 @@ import Link from "next/link";
 import { useAppStore } from "@/store/appStore";
 import { useLoginStore } from "@/store/loginStore";
 import { useRouter } from "next/navigation";
+import { signupStore } from "@/store/signupStore";
 
 function Nav() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const navRef = useRef<HTMLDivElement>(null);
   const { user } = useAppStore();
   const { logOut } = useLoginStore();
+  const { role } = signupStore();
   const router = useRouter();
   // Close the mobile menu when clicking outside of it
   useEffect(() => {
@@ -79,6 +81,13 @@ function Nav() {
                   Saved
                 </Button>
               </Link>
+              {role === "agent" && (
+                <Link href={"/studio"}>
+                  <Button variant="link" className="cursor-pointer">
+                    Studio
+                  </Button>
+                </Link>
+              )}
               <Link href={"/messages"}>
                 <Button variant="link" className="cursor-pointer">
                   Messages
@@ -148,6 +157,13 @@ function Nav() {
                     Saved
                   </Button>
                 </Link>
+                {role === "agent" && (
+                  <Link href={"/studio"}>
+                    <Button variant="link" className="cursor-pointer">
+                      Studio
+                    </Button>
+                  </Link>
+                )}
                 <Link href={"/messages"}>
                   <Button variant="link" className="cursor-pointer">
                     Messages
