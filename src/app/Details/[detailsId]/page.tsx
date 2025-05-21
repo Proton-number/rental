@@ -1,20 +1,40 @@
 "use client";
 
-import { Listings } from "@/components/Listing";
+import { sanityStore } from "@/store/sanityStore";
 import { useParams } from "next/navigation";
+import { useEffect } from "react";
+import { PortableText } from "@portabletext/react";
 
 function Detail() {
   const { detailsId } = useParams();
-  const listing = Listings.find((item) => item.id === Number(detailsId));
-  if (!listing) {
-    return <div className="p-6 text-red-500">Listing not found.</div>;
+  const { singleProperties, fetchProperties, fetchSingleProperties } =
+    sanityStore();
+
+  useEffect(() => {
+    if (detailsId && typeof detailsId === "string") {
+      fetchSingleProperties(detailsId);
+    }
+  }, [detailsId, fetchSingleProperties]);
+
+  if (!singleProperties) {
+    return (
+      <p className="text-center text-gray-500">Loading property details...</p>
+    );
   }
+
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-2">{listing.title}</h1>
-      <p className="text-gray-700 mb-4">{listing.description}</p>
-      <p className="text-lg font-semibold mb-1">{listing.price}</p>
-      <p className="text-gray-500">{listing.location}</p>
+    <div className="min-h-screen flex flex-col  p-10 items-justify relative ">
+      <h1 className="text-3xl font-bold mb-4">{singleProperties.title}</h1>
+
+      {singleProperties.mainImage?.asset?.url && (
+        <img
+          src={singleProperties.mainImage.asset.url}
+          alt={singleProperties.mainImage.alt || singleProperties.title}
+          className="rounded-lg w-full object-cover mb-6"
+        />
+      )}
+
+      <PortableText value={singleProperties.body} />
     </div>
   );
 }

@@ -1,46 +1,139 @@
-import { Listings } from "@/components/Listing";
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useAppStore } from "@/store/appStore";
+import { sanityStore } from "@/store/sanityStore";
+import Image from "next/image";
+import { urlFor } from "@/sanity/lib/image";
+
 function Properties() {
+  const [inputValue, setInputValue] = useState(""); // What user types
+  const [searchTerm, setSearchTerm] = useState(""); // Applied filter on click
+  const { saveListing } = useAppStore();
+  const { properties, fetchProperties } = sanityStore();
+
+  const searchHandler = () => {
+    setSearchTerm(inputValue);
+  };
+
+  useEffect(() => {
+    if (inputValue.trim() === "") {
+      setSearchTerm("");
+    }
+  }, [inputValue]);
+
+  const saveHandler = async () => {
+    await saveListing("listingId"); // Replace with actual listing ID
+  };
+
+  useEffect(() => {
+    const fetchPropertiesData = async () => {
+      console.log("🔄 Fetching properties...");
+      try {
+        await fetchProperties();
+      } catch (error) {
+        console.error("Error fetching properties:", error);
+      }
+    };
+
+    fetchPropertiesData();
+  }, [fetchProperties]);
+
   return (
     <div className="p-4">
-      {/* Top part */}
+      {/* Search bar */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">
-        <Input placeholder="Search location or property" className="flex-1" />
-        <Input
-          placeholder="Price Range (e.g., 1000 -2000)"
-          className="flex-1"
-        />
-        <Input placeholder="Number of Rooms" className="flex-1" />
-        <Button className="cursor-pointer">Filter</Button>
+        <div className="flex-1 relative">
+          <Input
+            placeholder="Search location or property"
+            className="w-full px-4 py-2 border-2 border-emerald-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200"
+            onChange={(e) => setInputValue(e.target.value)}
+            value={inputValue}
+          />
+          <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+            <svg
+              className="w-5 h-5 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </div>
+        </div>
+
+        <Button
+          className="px-6 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-medium transition-colors duration-200 shadow-md hover:shadow-lg"
+          onClick={searchHandler} // Trigger filtering
+        >
+          Search
+        </Button>
       </div>
-      {/* Properties */}
+
+      {/* Property Listings */}
       <>
         <h2 className="text-2xl font-semibold mb-4">Available Properties</h2>
+        {!properties && (
+          <p className="text-red-500 font-medium">
+            No properties loaded — check Sanity connection.
+          </p>
+        )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-10">
-          {Listings.map((listing, id) => (
-            <Card
-              key={id}
-              className="bg-white shadow-lg rounded-lg p-4 flex flex-col "
-            >
-              <div className="w-full h-48 bg-gray-200 mb-4 rounded-lg"></div>
-              <h2 className="text-xl font-bold ">{listing.title}</h2>
-              <p className="text-gray-500  text-sm">{listing.description}</p>
-              <p className="text-gray-700 font-semibold">{listing.price}</p>
-              <p className="text-gray-500">{listing.location}</p>
-              <Link href={`/Details/${listing.id}`}>
-                <Button
-                  variant="outline"
-                  className="rounded-full font-semibold bg-black text-white cursor-pointer"
+          {properties &&
+            properties
+              .filter(
+                (listing) =>
+                  searchTerm === "" ||
+                  listing.title
+                    .toLowerCase()
+                    .includes(searchTerm.toLowerCase()) ||
+                  listing?.description
+                    ?.toLowerCase()
+                    .includes(searchTerm.toLowerCase())
+              )
+              .map((listing) => (
+                <Card
+                  key={listing?.slug?.current}
+                  className="bg-white shadow-lg rounded-lg p-4 flex flex-col"
                 >
-                  View Details
-                </Button>
-              </Link>
-            </Card>
-          ))}
+                  <div className="relative h-32 w-full mb-4">
+                    <Image
+                      alt={listing?.mainImage?.alt || listing.title}
+                      src={listing?.mainImage?.asset?.url || "/vercel.svg"}
+                      fill
+                      className="object-cover rounded-md"
+                      priority
+                    />
+                  </div>
+                  <h2 className="text-xl font-bold">{listing.title}</h2>
+                  {/* <p className="text-gray-500 text-sm">{listing.description}</p> */}
+                  <div className="flex justify-between mt-2">
+                    <Link href={`/Details/${listing.slug.current}`}>
+                      <Button className="bg-emerald-500 text-white hover:bg-emerald-600 transition-colors duration-200 shadow-md hover:shadow-lg cursor-pointer">
+                        View Details
+                      </Button>
+                    </Link>
+
+                    <Button
+                      onClick={() => saveListing(listing.slug.current)}
+                      variant="outline"
+                      className="border-2 border-emerald-500 text-emerald-500 cursor-pointer px-4 py-2 rounded-lg hover:bg-emerald-50 transition-colors duration-200 shadow-md hover:shadow-lg"
+                    >
+                      Save
+                    </Button>
+                  </div>
+                </Card>
+              ))}
         </div>
       </>
     </div>

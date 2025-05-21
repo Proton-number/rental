@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@portabletext/react": "^3.2.1",
     "@radix-ui/react-avatar": "^1.1.9",
     "@radix-ui/react-dialog": "^1.1.13",
     "@radix-ui/react-label": "^2.1.6",
@@ -18,7 +19,7 @@
     "@radix-ui/react-tabs": "^1.1.11",
     "@sanity/client": "7.1.0",
     "@sanity/icons": "3.7.0",
-    "@sanity/image-url": "1",
+    "@sanity/image-url": "^1.1.0",
     "@sanity/types": "3.88.2",
     "@sanity/ui": "2.15.17",
     "@sanity/vision": "3",

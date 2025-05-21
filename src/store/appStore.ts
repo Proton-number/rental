@@ -1,6 +1,13 @@
 import { create } from "zustand";
 import { User, sendPasswordResetEmail } from "firebase/auth";
-import { auth } from "@/config/firebase";
+import { auth, db } from "@/config/firebase";
+import {
+  collection,
+  doc,
+  setDoc,
+  deleteDoc,
+  getDocs,
+} from "firebase/firestore";
 
 interface APPSTORE {
   user: User | null;
@@ -16,6 +23,11 @@ interface APPSTORE {
   resetEmail: string;
   setResetEmail: (email: string) => void;
   resetHandler: () => Promise<boolean>;
+  savedListings: any[];
+  setSavedListings: (listings: any[]) => void;
+  getSavedListings: () => Promise<void>;
+  saveListing: (listingId: string) => Promise<void>;
+  removeSavedListing: (listingId: string) => Promise<void>;
 }
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export const useAppStore = create<APPSTORE>((set, get) => ({
@@ -54,6 +66,66 @@ export const useAppStore = create<APPSTORE>((set, get) => ({
         resetError: "Failed to send password reset email. Please try again.",
       });
       return false;
+    }
+  },
+
+  savedListings: [],
+  setSavedListings: (listings) => set({ savedListings: listings }),
+
+  saveListing: async (listingId: string) => {
+    const { user } = get();
+    if (!user) {
+      set({ registerError: "User not authenticated" });
+      return;
+    }
+
+    try {
+      const listingRef = doc(db, "users", user.uid, "savedListings", listingId);
+      await setDoc(listingRef, { listingId });
+      console.log("Listing saved successfully");
+    } catch (error) {
+      console.error("Error saving listing:", error);
+      set({ registerError: "Failed to save listing" });
+    }
+  },
+  removeSavedListing: async (listingId: string) => {
+    const { user } = get();
+    if (!user) {
+      set({ registerError: "User not authenticated" });
+      return;
+    }
+
+    try {
+      const listingRef = doc(db, "users", user.uid, "savedListings", listingId);
+      await deleteDoc(listingRef);
+      console.log("Listing removed successfully");
+    } catch (error) {
+      console.error("Error removing listing:", error);
+      set({ registerError: "Failed to remove listing" });
+    }
+  },
+
+  getSavedListings: async () => {
+    const { user } = get();
+    if (!user) {
+      set({ registerError: "User not authenticated" });
+      return;
+    }
+
+    try {
+      const savedListingsRef = collection(
+        db,
+        "users",
+        user.uid,
+        "savedListings"
+      );
+      const snapshot = await getDocs(savedListingsRef);
+      const savedListings = snapshot.docs.map((doc) => doc.data().listingId);
+      set({ savedListings });
+      console.log("Saved listings retrieved successfully");
+    } catch (error) {
+      console.error("Error retrieving saved listings:", error);
+      set({ registerError: "Failed to retrieve saved listings" });
     }
   },
 }));

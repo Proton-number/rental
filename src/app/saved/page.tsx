@@ -1,42 +1,72 @@
-import { Listings } from "@/components/Listing";
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useAppStore } from "@/store/appStore";
 import Link from "next/link";
-import React from "react";
+import { useEffect } from "react";
+import Image from "next/image";
+import { sanityStore } from "@/store/sanityStore";
 
 function Saved() {
+  const { removeSavedListing, getSavedListings, savedListings } = useAppStore();
+  const { fetchProperties, properties } = sanityStore();
+
+  useEffect(() => {
+    fetchProperties(); // Load all listings
+    getSavedListings(); // Load user's saved IDs
+  }, [fetchProperties, getSavedListings]);
+
+  const savedFullListings =
+    properties?.filter((prop) => savedListings.includes(prop.slug.current)) ||
+    [];
+
   return (
     <div className="p-4">
-      {" "}
-      <>
-        <h2 className="text-2xl font-semibold mb-4">Your Saved Properties</h2>
-
+      <h2 className="text-2xl font-semibold mb-4 ">Your Saved Properties</h2>
+      {savedFullListings.length === 0 ? (
+        <p className="text-gray-500 flex items-center justify-center">
+          You haven&apos;t saved any properties yet.
+        </p>
+      ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-10">
-          {Listings.map((listing, id) => (
+          {savedFullListings.map((listing, id) => (
             <Card
               key={id}
-              className="bg-white shadow-lg rounded-lg p-4 flex flex-col "
+              className="bg-white shadow-lg rounded-lg p-4 flex flex-col"
             >
-              <div className="w-full h-48 bg-gray-200 mb-4 rounded-lg"></div>
-              <h2 className="text-xl font-bold ">{listing.title}</h2>
-              <p className="text-gray-500  text-sm">{listing.description}</p>
-              <p className="text-gray-700 font-semibold">{listing.price}</p>
-              <p className="text-gray-500">{listing.location}</p>
+              <div className="relative h-32 w-full mb-4">
+                <Image
+                  alt={listing?.mainImage?.alt || listing.title}
+                  src={listing?.mainImage?.asset?.url || "/vercel.svg"}
+                  fill
+                  className="object-cover rounded-md"
+                  priority
+                />
+              </div>
+              <h2 className="text-xl font-bold">{listing.title}</h2>
+              <p className="text-gray-500 text-sm">{listing.description}</p>
               <div className="flex justify-between items-center">
-                <Link href={`/Details/${listing.id}`}>
-                  <Button
-                    variant="outline"
-                    className=" bg-black text-white cursor-pointer"
-                  >
+                <Link href={`/Details/${listing.slug.current}`}>
+                  <Button className="bg-emerald-500 text-white hover:bg-emerald-600">
                     View Details
                   </Button>
                 </Link>
-                <Button>Remove</Button>
+                <Button
+                  onClick={async () => {
+                    await removeSavedListing(listing.slug.current);
+                    getSavedListings(); // Refresh after removal
+                  }}
+                  variant="outline"
+                  className="border-2 border-emerald-500 text-emerald-500 hover:bg-emerald-50"
+                >
+                  Remove
+                </Button>
               </div>
             </Card>
           ))}
         </div>
-      </>
+      )}
     </div>
   );
 }
