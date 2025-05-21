@@ -208,27 +208,24 @@ function Messages() {
       window.removeEventListener("keydown", handleEscape);
     };
   }, []);
-
   useEffect(() => {
+    if (!justSentMessage) return;
+
     const container = messagesWrapperRef.current;
-    if (!container || !justSentMessage) return;
+    if (!container) return;
 
-    const currentMessages =
-      messageList[selectedChat as keyof typeof messageList];
-
-    const isNearBottom = () => {
-      const scrollPosition =
-        container.scrollHeight - container.scrollTop - container.clientHeight;
-      const threshold = 100;
-      return scrollPosition <= threshold;
-    };
-
-    if (isNearBottom()) {
-      container.scrollTop = container.scrollHeight;
+    const SCROLL_THRESHOLD = 100;
+    const scrollDistance = container.scrollHeight - container.scrollTop - container.clientHeight;
+    
+    if (scrollDistance <= SCROLL_THRESHOLD) {
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: 'smooth'
+      });
     }
 
     setJustSentMessage(false);
-  }, [justSentMessage, selectedChat]);
+  }, [justSentMessage]);
 
   return (
     <div className="flex min-h-screen bg-gray-50 ">
