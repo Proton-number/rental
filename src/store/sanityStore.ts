@@ -78,7 +78,7 @@ interface SanityStore {
   fetchSingleProperties: (yearId: string) => Promise<void>;
 }
 
-export const sanityStore = create<SanityStore>((set, get) => ({
+export const sanityStore = create<SanityStore>((set) => ({
   error: null,
   properties: null,
   singleProperties: null,

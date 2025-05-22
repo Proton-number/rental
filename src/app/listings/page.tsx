@@ -8,7 +8,6 @@ import Link from "next/link";
 import { useAppStore } from "@/store/appStore";
 import { sanityStore } from "@/store/sanityStore";
 import Image from "next/image";
-import { urlFor } from "@/sanity/lib/image";
 
 function Properties() {
   const [inputValue, setInputValue] = useState(""); // What user types
@@ -25,10 +24,6 @@ function Properties() {
       setSearchTerm("");
     }
   }, [inputValue]);
-
-  const saveHandler = async () => {
-    await saveListing("listingId"); // Replace with actual listing ID
-  };
 
   useEffect(() => {
     const fetchPropertiesData = async () => {

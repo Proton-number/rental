@@ -23,8 +23,8 @@ interface APPSTORE {
   resetEmail: string;
   setResetEmail: (email: string) => void;
   resetHandler: () => Promise<boolean>;
-  savedListings: any[];
-  setSavedListings: (listings: any[]) => void;
+  savedListings: string[];
+  setSavedListings: (listings: string[]) => void;
   getSavedListings: () => Promise<void>;
   saveListing: (listingId: string) => Promise<void>;
   removeSavedListing: (listingId: string) => Promise<void>;
