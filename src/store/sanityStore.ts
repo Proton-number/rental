@@ -68,6 +68,40 @@ interface Properties {
   mainImage?: Image;
   body: PortableTextContent[];
   _id: string;
+  propertyGallery: any[];
+  author?: {
+    _id: string;
+    name: string;
+  };
+  propertyType?: string;
+  price?: string;
+  location?: string;
+  priceType?: string;
+  parking?: number;
+  area?: string;
+  furnished?: boolean;
+  availability?: string;
+  features?: string[];
+  nearbyPlaces?: string[];
+  bedrooms?: number;
+  bathrooms?: number;
+  projectUrl?: string;
+  publishedAt?: string;
+}
+interface Agent {
+  _id: string;
+  name: string;
+  slug?: {
+    current: string;
+  };
+  title?: string;
+  yearsExperience?: number;
+  totalProperties?: number;
+  phone?: string;
+  email?: string;
+  whatsapp?: string;
+  bio?: PortableTextContent[];
+  authorImage?: string;
 }
 
 interface SanityStore {
@@ -76,63 +110,135 @@ interface SanityStore {
   fetchProperties: () => Promise<void>;
   singleProperties: Properties | null;
   fetchSingleProperties: (yearId: string) => Promise<void>;
+  fetchFeaturedListings: () => Promise<void>;
+  agent: Agent | null;
+  fetchAgent: (detailsId: string) => Promise<void>;
 }
 
-export const sanityStore = create<SanityStore>((set) => ({
-  error: null,
-  properties: null,
-  singleProperties: null,
-  fetchProperties: async () => {
-    const REVIEW_QUERY = `*[_type == "post"] | order(_createdAt asc) {
+export const sanityStore = create<SanityStore>((set) => {
+  // Common query fragments
+  const AUTHOR_FRAGMENT = `
+  _id,
+  name,
+  slug,
+  title,
+  yearsExperience,
+  totalProperties,
+  phone,
+  email,
+  whatsapp,
+  bio,
+  "authorImage": image.asset->url
+`;
+
+  const IMAGE_FRAGMENT = `
+    asset->{
+      _id, 
+      url
+    }, 
+    alt
+  `;
+
+  // Error handler
+  const handleError = (
+    error: any,
+    errorMessage: string,
+    resetState: object
+  ) => {
+    console.error(`Error: ${errorMessage}:`, error);
+    set({ error: errorMessage, ...resetState });
+  };
+
+  return {
+    error: null,
+    properties: null,
+    singleProperties: null,
+    agent: null,
+
+    fetchProperties: async () => {
+      const query = `*[_type == "post"] | order(_createdAt asc) {
+        title, 
+        slug, 
+        description,  
+        projectUrl,
+      
+        mainImage{${IMAGE_FRAGMENT}}, 
+        body,
+        author->{${AUTHOR_FRAGMENT}}
+      }`;
+
+      try {
+        const response = await sanityClient.fetch<Array<Properties>>(query);
+        set({ properties: response, error: null });
+      } catch (error) {
+        handleError(error, "Failed to fetch projects", { properties: null });
+      }
+    },
+
+    fetchSingleProperties: async (slug: string) => {
+      const query = `*[_type == "post" && slug.current == $slug] {
         title, 
         description,  
         slug, 
         projectUrl,
-        mainImage{
-            asset->{
-                _id, 
-                url
-            }, 
-            alt
-        }, 
-        body
-    }`;
-    try {
-      const response =
-        await sanityClient.fetch<Array<Properties>>(REVIEW_QUERY);
-      console.log("Fetched properties from Sanity:", response);
-      set({ properties: response, error: null });
-    } catch (error) {
-      console.error("Error fetching projects:", error);
-      set({ error: "Failed to fetch projects", properties: null });
-    }
-  },
-  fetchSingleProperties: async (slug: string) => {
-    const SINGLE_QUERY = `*[_type == "post" && slug.current == $slug] {
-      title, 
-      description,  
-      slug, 
-      projectUrl,
-      mainImage{
-        asset->{
-          _id, 
-          url
-        }, 
-        alt
-      }, 
-      body
-    }`;
-    try {
-      const response = await sanityClient.fetch<Array<Properties>>(
-        SINGLE_QUERY,
-        {
-          slug, // ✅ This matches the $slug param in the query
-        }
-      );
-      set({ singleProperties: response[0], error: null });
-    } catch (error) {
-      console.error("Error fetching projects:", error);
-      set({ error: "Failed to fetch project", singleProperties: null });
-    }
-  },
-}));
+        propertyType,
+        location,
+        price,
+        priceType,
+        parking,
+        area,
+        furnished,
+        availability,
+        features,
+        nearbyPlaces,
+        bedrooms,
+        bathrooms,
+        mainImage{${IMAGE_FRAGMENT}}, 
+        body,
+        author->{${AUTHOR_FRAGMENT}}
+      }`;
+
+      try {
+        const response = await sanityClient.fetch<Array<Properties>>(query, {
+          slug,
+        });
+        set({ singleProperties: response[0], error: null });
+      } catch (error) {
+        handleError(error, "Failed to fetch project", {
+          singleProperties: null,
+        });
+      }
+    },
+
+    fetchFeaturedListings: async () => {
+      const query = `*[_type == "post"] | order(_createdAt asc)[0...4]{
+        title, 
+        description, 
+        slug, 
+        mainImage{${IMAGE_FRAGMENT}}, 
+        body,
+        author->{${AUTHOR_FRAGMENT}}
+      }`;
+
+      try {
+        const response = await sanityClient.fetch<Array<Properties>>(query);
+        set({ properties: response, error: null });
+      } catch (error) {
+        handleError(error, "Failed to fetch projects", { properties: null });
+      }
+    },
+
+    fetchAgent: async (detailsId: string) => {
+      const query = `*[_type == "author" && _id == "${detailsId}"]{
+        ${AUTHOR_FRAGMENT}
+      }`;
+
+      try {
+        const response = await sanityClient.fetch(query);
+        set({ agent: response[0] || null, error: null });
+      } catch (error) {
+        handleError(error, "Failed to fetch author", { agent: null });
+      }
+    },
+  };
+});

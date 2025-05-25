@@ -55,7 +55,7 @@ export const useLoginStore = create<LOGIN>((set, get) => ({
       return user;
     } catch (error: unknown) {
       const errorMessage =
-        error instanceof Error ? error.message : "An unknown error occurred";
+        error instanceof Error ? error.message : "An unknown error occurred"; 
       useAppStore.getState().setLoginError(errorMessage);
       return null;
     }

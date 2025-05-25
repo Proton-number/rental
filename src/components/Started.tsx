@@ -11,7 +11,9 @@ function Started() {
         List your properties and connect with potential tenants instantly!
       </p>
       <Link href={"/signup"}>
-        <Button className="cursor-pointer">Get Started</Button>
+        <Button className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-8 py-3 rounded-lg transition-all duration-200 transform hover:scale-105 cursor-pointer">
+          Get Started
+        </Button>
       </Link>
     </div>
   );

@@ -26,16 +26,15 @@ function Properties() {
   }, [inputValue]);
 
   useEffect(() => {
-    const fetchPropertiesData = async () => {
-      console.log("🔄 Fetching properties...");
+    const loadProperties = async () => {
       try {
         await fetchProperties();
       } catch (error) {
-        console.error("Error fetching properties:", error);
+        console.error("Failed to load properties:", error);
       }
     };
 
-    fetchPropertiesData();
+    loadProperties();
   }, [fetchProperties]);
 
   return (
@@ -89,23 +88,19 @@ function Properties() {
               .filter(
                 (listing) =>
                   searchTerm === "" ||
-                  listing.title
-                    .toLowerCase()
-                    .includes(searchTerm.toLowerCase()) ||
-                  listing?.description
-                    ?.toLowerCase()
-                    .includes(searchTerm.toLowerCase())
+                  listing.title.toLowerCase().includes(searchTerm.toLowerCase())
               )
               .map((listing) => (
                 <Card
                   key={listing?.slug?.current}
                   className="bg-white shadow-lg rounded-lg p-4 flex flex-col"
                 >
-                  <div className="relative h-32 w-full mb-4">
+                  <div className="relative h-48 w-full mb-4">
                     <Image
                       alt={listing?.mainImage?.alt || listing.title}
                       src={listing?.mainImage?.asset?.url || "/vercel.svg"}
                       fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       className="object-cover rounded-md"
                       priority
                     />

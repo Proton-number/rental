@@ -3,10 +3,29 @@
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Send, ArrowLeft } from "lucide-react";
+import {
+  Search,
+  Send,
+  ArrowLeft,
+  MessageCircle,
+  MoreVertical,
+  Video,
+  Smile,
+  Plus,
+  Phone,
+  Check,
+} from "lucide-react";
 import React, { useState, useEffect, useRef } from "react";
 
-const chat = [
+interface ChatItem {
+  name: string;
+  time: string;
+  message: string;
+  avatar: string;
+  unread?: number;
+}
+
+const chat: ChatItem[] = [
   {
     name: "Sarah",
     time: "now",
@@ -165,62 +184,68 @@ function Messages() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [messageList, setMessageList] = useState(initialMessages);
   const [justSentMessage, setJustSentMessage] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  // Message handling types
+  type MessageChangeEvent = React.ChangeEvent<HTMLInputElement>;
+  type KeyboardPressEvent = React.KeyboardEvent<HTMLInputElement>;
 
-  const handleMessageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Message handlers
+  const handleMessageChange = (e: MessageChangeEvent) => {
     setMessageValue(e.target.value);
   };
 
+  const createNewMessage = (text: string): Message => ({
+    id: Date.now(),
+    sender: "Me",
+    text,
+    time: new Date().toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
+    isSent: true,
+  });
+
   const sendHandler = () => {
     if (messageValue.trim() === "" || !selectedChat) return;
-    const newMessage: Message = {
-      id: Date.now(),
-      sender: "Me",
-      text: messageValue,
-      time: new Date().toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      isSent: true,
-    };
 
     setMessageList((prev) => ({
       ...prev,
-      [selectedChat]: [...(prev[selectedChat] || []), newMessage],
+      [selectedChat]: [
+        ...(prev[selectedChat] || []),
+        createNewMessage(messageValue),
+      ],
     }));
     setMessageValue("");
     setJustSentMessage(true);
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      sendHandler();
-    }
+  const handleKeyPress = (e: KeyboardPressEvent) => {
+    if (e.key === "Enter") sendHandler();
   };
 
+  // Escape key handler
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setSelectedChat(null);
-      }
+      if (e.key === "Escape") setSelectedChat(null);
     };
+
     window.addEventListener("keydown", handleEscape);
-    return () => {
-      window.removeEventListener("keydown", handleEscape);
-    };
+    return () => window.removeEventListener("keydown", handleEscape);
   }, []);
+
+  // Auto-scroll handler
   useEffect(() => {
-    if (!justSentMessage) return;
+    if (!justSentMessage || !messagesWrapperRef.current) return;
 
     const container = messagesWrapperRef.current;
-    if (!container) return;
-
     const SCROLL_THRESHOLD = 100;
-    const scrollDistance = container.scrollHeight - container.scrollTop - container.clientHeight;
-    
+    const scrollDistance =
+      container.scrollHeight - container.scrollTop - container.clientHeight;
+
     if (scrollDistance <= SCROLL_THRESHOLD) {
       container.scrollTo({
         top: container.scrollHeight,
-        behavior: 'smooth'
+        behavior: "smooth",
       });
     }
 
@@ -228,169 +253,180 @@ function Messages() {
   }, [justSentMessage]);
 
   return (
-    <div className="flex min-h-screen bg-gray-50 ">
-      {/* Sidebar */}
-      <nav
-        className={`flex flex-col 
-          ${sidebarOpen ? "w-full" : "w-0"}
-          ${!sidebarOpen ? "hidden" : "block"}
-          md:w-90 bg-white transition-transform transform
-          ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
-          md:translate-x-0 md:block border-r border-gray-200`}
+    <div className="flex h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 overflow-hidden">
+      {/* Left sidebar */}
+      <aside
+        className={`bg-white w-80 border-r border-gray-200 flex flex-col transition-all duration-300 ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } md:relative md:translate-x-0 `}
       >
-        {/* Header */}
-        <header className="p-4 border-b border-gray-200">
-          <h2 className="text-xl font-bold text-gray-900">Messages</h2>
-        </header>
-
-        {/* Search */}
-        <div className="p-4 border-b border-gray-200">
+        <div className="p-4 border-b">
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-xl font-semibold">Messages</h1>
+            <Button variant="ghost" size="icon">
+              <MoreVertical size={20} />
+            </Button>
+          </div>
           <div className="relative">
-            <Search
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-              size={16}
-              aria-hidden="true"
-            />
+            <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
             <Input
-              type="search"
-              placeholder="Search conversations..."
-              className="pl-9 bg-gray-50 hover:bg-gray-100 focus:bg-white transition-colors"
-              aria-label="Search conversations"
-              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search messages..."
+              className="pl-9"
               value={search}
+              onChange={(e) => setSearch(e.target.value)}
             />
           </div>
         </div>
 
-        {/* Chat List */}
-        <ul className="flex-1 overflow-y-auto max-h-[calc(100vh-180px)]">
+        <div className="overflow-y-auto flex-1">
           {chat
-            .filter((user) =>
-              user.name.toLowerCase().includes(search.toLowerCase())
+            .filter((item) =>
+              item.name.toLowerCase().includes(search.toLowerCase())
             )
-            .map((user, index) => (
-              <li key={index}>
-                <button
-                  onClick={() => {
-                    setSelectedChat(user.name);
-                    setSidebarOpen(!sidebarOpen);
-                  }}
-                  className="w-full px-4 py-3 flex gap-4 hover:bg-gray-50 transition-colors focus:bg-gray-100 focus:outline-none"
-                >
-                  <Avatar className="h-12 w-12 bg-primary/10 text-primary font-semibold flex justify-center items-center">
-                    {user.avatar}
+            .map((item, index) => (
+              <div
+                key={index}
+                className={`p-4 cursor-pointer hover:bg-gray-50 transition-colors ${
+                  selectedChat === item.name ? "bg-blue-50" : ""
+                }`}
+                onClick={() => {
+                  setSelectedChat(item.name);
+                  setSidebarOpen(false);
+                }}
+              >
+                <div className="flex items-center  gap-3">
+                  <Avatar className="h-10 w-10 flex items-center justify-center bg-emerald-500">
+                    <div className="text-white">{item.avatar}</div>
                   </Avatar>
-                  <div className="flex-1 min-w-0 text-left">
-                    <div className="flex justify-between items-center mb-1">
-                      <p className="font-semibold text-gray-900">{user.name}</p>
-                      <span className="text-xs text-gray-500">{user.time}</span>
+                  <div className="flex-1">
+                    <div className="flex justify-between items-center">
+                      <h3 className="font-medium">{item.name}</h3>
+                      <span className="text-xs text-gray-500">{item.time}</span>
                     </div>
                     <p className="text-sm text-gray-600 truncate">
-                      {user.message}
+                      {item.message}
                     </p>
                   </div>
-                </button>
-              </li>
-            ))}
-        </ul>
-      </nav>
-
-      {/* Chat Area */}
-      <main
-        className={`flex-1 flex-col bg-white min-h-screen md:h-auto  md:flex ${
-          sidebarOpen ? "hidden" : "flex"
-        }`}
-      >
-        {/* Chat Header */}
-        {selectedChat ? (
-          <header className="px-2 py-2 border-b-2 border-gray-200">
-            <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="md:hidden"
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-              >
-                <ArrowLeft className="h-5 w-5" />
-              </Button>
-              <div className="flex items-center gap-4">
-                <Avatar className="h-10 w-10 bg-primary/10 text-primary flex justify-center items-center">
-                  {selectedChat[0]}
-                </Avatar>
-                <div>
-                  <h2 className="font-semibold text-gray-900">
-                    {selectedChat}
-                  </h2>
-                  <p className="text-sm text-emerald-500">Online</p>
                 </div>
               </div>
-            </div>
-          </header>
-        ) : null}
+            ))}
+        </div>
+      </aside>
 
-        {/* Chat Body */}
+      {/* Main chat area */}
+      <main className="flex-1 flex flex-col">
         {selectedChat ? (
-          <div className="flex flex-col flex-1  max-h-[calc(100vh-50px)] ">
-            {/* Scrollable Messages */}
+          <>
+            <header className="px-4 py-3 border-b bg-white/80 backdrop-blur-sm">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="md:hidden"
+                    onClick={() => setSidebarOpen(true)}
+                  >
+                    <ArrowLeft size={20} />
+                  </Button>
+                  <Avatar className="h-10 w-10 flex items-center justify-center bg-emerald-500">
+                    <div className="text-white">{selectedChat[0]}</div>
+                  </Avatar>
+                  <div>
+                    <h2 className="font-medium">{selectedChat}</h2>
+                    <p className="text-sm text-gray-500">Online</p>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="ghost" size="icon">
+                    <Phone size={20} />
+                  </Button>
+                  <Button variant="ghost" size="icon">
+                    <Video size={20} />
+                  </Button>
+                  <Button variant="ghost" size="icon">
+                    <MoreVertical size={20} />
+                  </Button>
+                </div>
+              </div>
+            </header>
+
             <div
+              className="flex-1 overflow-y-auto p-4"
               ref={messagesWrapperRef}
-              className="flex-1 overflow-y-auto px-6 py-4 "
             >
-              {(messageList[selectedChat] || []).map((message) => (
+              {messageList[selectedChat]?.map((message, index) => (
                 <div
-                  key={message.id}
+                  key={index}
                   className={`flex ${
                     message.isSent ? "justify-end" : "justify-start"
-                  } mb-2`}
+                  } mb-4`}
                 >
-                  <div>
+                  <div
+                    className={`max-w-[70%] rounded-lg p-3 ${
+                      message.isSent
+                        ? "bg-emerald-500 text-white"
+                        : "bg-gray-100 text-gray-800"
+                    }`}
+                  >
+                    <p>{message.text}</p>
                     <div
-                      className={`p-3 max-w-xs md:max-w-md rounded-2xl ${
-                        message.isSent
-                          ? "bg-emerald-500 text-white rounded-br-none"
-                          : "bg-gray-200 text-black rounded-bl-none"
-                      }`}
-                    >
-                      {message.text}
-                    </div>
-                    <span
-                      className={`text-xs text-gray-500 block mt-1 ${
-                        message.isSent ? "text-right" : "text-left"
+                      className={`text-xs mt-1 ${
+                        message.isSent ? "text-blue-100" : "text-gray-500"
                       }`}
                     >
                       {message.time}
-                    </span>
+                    </div>
                   </div>
                 </div>
               ))}
-              <div ref={messagesWrapperRef} />
+              <div ref={messagesEndRef} />
             </div>
 
-            {/* Fixed Input Bar */}
-            <div className="bg-white border-t border-gray-200 px-4 py-3 sticky bottom-0 z-10">
-              <div className="flex items-center">
+            <footer className="p-4 bg-white/80 backdrop-blur-sm border-t">
+              <div className="flex items-center gap-2">
+                <Button variant="ghost" size="icon">
+                  <Plus size={20} />
+                </Button>
                 <Input
+                  placeholder="Type a message..."
                   value={messageValue}
                   onChange={handleMessageChange}
                   onKeyDown={handleKeyPress}
-                  type="text"
-                  placeholder="Type a message..."
-                  className="flex-1 rounded-full px-4 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="flex-1"
                 />
                 <Button
-                  onClick={sendHandler}
-                  className="ml-2 bg-emerald-500 text-white p-2 rounded-full flex-shrink-0"
+                  variant="ghost"
+                  size="icon"
+                  className="hover:text-yellow-500 transition-colors"
                 >
-                  <Send className="h-5 w-5" />
+                  <Smile size={20} />
+                </Button>
+                <Button
+                  onClick={sendHandler}
+                  size="icon"
+                  variant="default"
+                  className="bg-emerald-500 hover:bg-emerald-600 transition-colors"
+                  disabled={!messageValue.trim()}
+                >
+                  <Send size={20} className="mr-1" />
                 </Button>
               </div>
-            </div>
-          </div>
+            </footer>
+          </>
         ) : (
-          <div className="flex flex-col items-center justify-center h-full text-center text-gray-400">
-            <p className="text-lg font-medium">
-              Select a chat to start messaging
+          <div className="flex-1 flex items-center justify-center flex-col gap-4 p-4 text-center">
+            <MessageCircle size={48} className="text-gray-400" />
+            <h2 className="text-xl font-semibold">Select a conversation</h2>
+            <p className="text-gray-500">
+              Choose from your existing conversations or start a new one
             </p>
+            <Button
+              variant="outline"
+              onClick={() => setSidebarOpen(true)}
+              className="md:hidden "
+            >
+              Show Conversations
+            </Button>
           </div>
         )}
       </main>
