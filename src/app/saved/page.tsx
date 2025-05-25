@@ -7,44 +7,7 @@ import Link from "next/link";
 import { useEffect } from "react";
 import Image from "next/image";
 import { sanityStore } from "@/store/sanityStore";
-
-// Helper function to extract plain text from Portable Text
-interface PortableTextSpan {
-  _type: 'span';
-  text: string;
-}
-
-interface PortableTextBlock {
-  _type: 'block';
-  children?: PortableTextSpan[];
-}
-
-type PortableText = string | PortableTextBlock[] | undefined;
-
-function getPlainTextFromPortableText(portableText: PortableText): string {
-  if (!portableText) return "No description available";
-
-  if (typeof portableText === "string") return portableText;
-
-  if (Array.isArray(portableText)) {
-    return (
-      portableText
-        .map((block: PortableTextBlock) => {
-          if (block._type === "block" && block.children) {
-            return block.children
-              .filter((child): child is PortableTextSpan => child._type === "span")
-              .map((span) => span.text)
-              .join("");
-          }
-          return "";
-        })
-        .join(" ")
-        .trim() || "No description available"
-    );
-  }
-
-  return "No description available";
-}
+import { PortableText } from "@portabletext/react";
 
 function Saved() {
   const { removeSavedListing, getSavedListings, savedListings } = useAppStore();
@@ -83,9 +46,13 @@ function Saved() {
                 />
               </div>
               <h2 className="text-xl font-bold">{listing.title}</h2>
-              <p className="text-gray-500 text-sm">
-                {getPlainTextFromPortableText(listing.description)}
-              </p>
+              <div className="text-gray-500 text-sm">
+                {typeof listing.description === "string" ? (
+                  listing.description
+                ) : (
+                  <PortableText value={listing.description} />
+                )}
+              </div>
               <div className="flex justify-between items-center">
                 <Link href={`/Details/${listing.slug.current}`}>
                   <Button className="bg-emerald-500 text-white hover:bg-emerald-600">

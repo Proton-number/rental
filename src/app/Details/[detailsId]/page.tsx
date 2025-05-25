@@ -448,7 +448,10 @@ function Detail() {
               >
                 <h3 className="text-lg font-semibold mb-3">Description</h3>
                 <div className="prose prose-gray max-w-none">
-                  <PortableText value={singleProperties.body} />
+                  {typeof singleProperties.description === 'string' 
+                    ? <p>{singleProperties.description}</p>
+                    : <PortableText value={singleProperties.description} />
+                  } 
                 </div>
               </motion.div>
             </motion.div>

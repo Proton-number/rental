@@ -89,7 +89,9 @@ export const useAppStore = create<APPSTORE>((set, get) => ({
         collection(db, "users", user.uid, "savedListings")
       );
       const listings = snapshot.docs.map((doc) => doc.data().listingId);
-      set({ savedListings: listings });
+      // Remove any duplicates and null values
+      const uniqueListings = [...new Set(listings)].filter(Boolean);
+      set({ savedListings: uniqueListings });
     } catch (error) {
       console.error("Fetch saved listings error:", error);
       set({ registerError: "Failed to retrieve saved listings" });
