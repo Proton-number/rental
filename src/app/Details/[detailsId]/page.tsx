@@ -611,7 +611,7 @@ function Detail() {
                     value: agent?.totalProperties,
                     label: "Properties Listed",
                   },
-                ].map(({ value, label }, index) => (
+                ].map(({ value, label }) => (
                   <motion.div
                     key={label}
                     className="text-center p-3 bg-gray-50 rounded-lg"
@@ -654,7 +654,7 @@ function Detail() {
                     variant: "outline",
                     href: "#schedule-visit", // You can replace with your scheduling link
                   },
-                ].map(({ icon: Icon, text, variant, href }, index) => (
+                ].map(({ icon: Icon, text, variant, href }) => (
                   <motion.div
                     key={text}
                     variants={fadeInUp}
