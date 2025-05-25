@@ -68,7 +68,7 @@ interface Properties {
   mainImage?: Image;
   body: PortableTextContent[];
   _id: string;
-  propertyGallery: any[];
+  propertyGallery?: Image[];
   author?: {
     _id: string;
     name: string;
@@ -141,9 +141,9 @@ export const sanityStore = create<SanityStore>((set) => {
 
   // Error handler
   const handleError = (
-    error: any,
+    error: Error | unknown,
     errorMessage: string,
-    resetState: object
+    resetState: Partial<SanityStore>
   ) => {
     console.error(`Error: ${errorMessage}:`, error);
     set({ error: errorMessage, ...resetState });

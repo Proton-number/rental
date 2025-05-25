@@ -18,7 +18,6 @@ import {
   Heart,
   Share2,
   ArrowLeft,
-  Star,
   CheckCircle,
   Camera,
   Eye,
@@ -107,8 +106,6 @@ function Detail() {
       fetchAgent(singleProperties.author._id);
     }
   }, [singleProperties?.author?._id, fetchAgent]);
-
-
 
   if (!singleProperties) {
     return (
@@ -350,7 +347,7 @@ function Detail() {
                     className="text-3xl font-bold text-emerald-600"
                     whileHover={{ scale: 1.05 }}
                   >
-                   $ {singleProperties.price}
+                    $ {singleProperties.price}
                   </motion.div>
                   <div className="text-sm text-gray-500">
                     {singleProperties.priceType}
@@ -382,7 +379,7 @@ function Detail() {
                     label: "Parking",
                   },
                   { icon: Square, value: singleProperties.area, label: "Area" },
-                ].map(({ icon: Icon, value, label }, index) => (
+                ].map(({ icon: Icon, value, label }) => (
                   <motion.div
                     key={label}
                     className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg cursor-pointer"
@@ -507,7 +504,7 @@ function Detail() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.2 }}
               >
-                What's Nearby
+                What&apos;s Nearby
               </motion.h3>
               <motion.div
                 className="space-y-3"
@@ -611,7 +608,7 @@ function Detail() {
                     value: agent?.totalProperties,
                     label: "Properties Listed",
                   },
-                ].map(({ value, label }, index) => (
+                ].map(({ value, label }) => (
                   <motion.div
                     key={label}
                     className="text-center p-3 bg-gray-50 rounded-lg"
@@ -654,7 +651,7 @@ function Detail() {
                     variant: "outline",
                     href: "#schedule-visit", // You can replace with your scheduling link
                   },
-                ].map(({ icon: Icon, text, variant, href }, index) => (
+                ].map(({ icon: Icon, text, variant, href }) => (
                   <motion.div
                     key={text}
                     variants={fadeInUp}

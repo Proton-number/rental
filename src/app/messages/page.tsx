@@ -13,7 +13,6 @@ import {
   Smile,
   Plus,
   Phone,
-  Check,
 } from "lucide-react";
 import React, { useState, useEffect, useRef } from "react";
 
