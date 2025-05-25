@@ -222,7 +222,8 @@ function Detail() {
                         <Image
                           src={
                             images[selectedImageIndex]?.asset?.url ||
-                            images[0]?.asset?.url
+                            images[0]?.asset?.url ||
+                            "/placeholder-image.jpg"
                           }
                           alt={singleProperties.title}
                           fill
@@ -278,8 +279,9 @@ function Detail() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.6 }}
                     >
-                      {images.map(
-                        (image: { asset: { url: string } }, index: number) => (
+                      {images
+                        .filter((image) => image?.asset?.url) // Filter out invalid images
+                        .map((image, index) => (
                           <motion.button
                             key={index}
                             onClick={() => setSelectedImageIndex(index)}
@@ -295,14 +297,15 @@ function Detail() {
                             transition={{ delay: 0.1 * index }}
                           >
                             <Image
-                              src={image.asset.url}
+                              src={
+                                image?.asset?.url || "/placeholder-image.jpg"
+                              }
                               alt={`Property image ${index + 1}`}
                               fill
                               className="object-cover"
                             />
                           </motion.button>
-                        )
-                      )}
+                        ))}
                     </motion.div>
                   )}
                 </>
@@ -608,7 +611,7 @@ function Detail() {
                     value: agent?.totalProperties,
                     label: "Properties Listed",
                   },
-                ].map(({ value, label }) => (
+                ].map(({ value, label }, index) => (
                   <motion.div
                     key={label}
                     className="text-center p-3 bg-gray-50 rounded-lg"
@@ -651,7 +654,7 @@ function Detail() {
                     variant: "outline",
                     href: "#schedule-visit", // You can replace with your scheduling link
                   },
-                ].map(({ icon: Icon, text, variant, href }) => (
+                ].map(({ icon: Icon, text, variant, href }, index) => (
                   <motion.div
                     key={text}
                     variants={fadeInUp}
